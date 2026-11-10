@@ -1,0 +1,15 @@
+{
+  "name": "dev",
+  "version": "1.0.0",
+  "description": "Deep PR review, plan review, and engineering principles",
+  "author": {
+    "name": "Michael Knopf"
+  },
+  "repository": "https://github.com/michaelknopf/claude-code-plugins",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "plan-review",
+    "principles"
+  ]
+}

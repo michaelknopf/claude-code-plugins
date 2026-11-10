@@ -1,0 +1,1 @@
+- After updating, bump the version in `.claude-plugin/marketplace.json` (both the entry in the `plugins` array and the corresponding `plugin.json` for the affected plugin — `dev` for core changes, `mk` for personal changes)

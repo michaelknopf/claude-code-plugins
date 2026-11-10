@@ -1,0 +1,27 @@
+{
+  "name": "mk-plugins",
+  "owner": {
+    "name": "Michael Knopf"
+  },
+  "description": "Opinionated Claude Code plugins: deep PR review, plan review, and engineering principles",
+  "plugins": [
+    {
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "Deep PR review, plan review, and engineering principles",
+      "version": "1.0.0",
+      "author": {
+        "name": "Michael Knopf"
+      }
+    },
+    {
+      "name": "mk",
+      "source": "./plugins/mk",
+      "description": "Personal commands: disk cleanup, Gmail filters, artifacts",
+      "version": "1.0.0",
+      "author": {
+        "name": "Michael Knopf"
+      }
+    }
+  ]
+}

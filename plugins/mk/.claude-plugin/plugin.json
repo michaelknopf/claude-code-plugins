@@ -1,0 +1,15 @@
+{
+  "name": "mk",
+  "version": "1.0.0",
+  "description": "Personal Claude Code commands: disk cleanup, Gmail filters, artifacts",
+  "author": {
+    "name": "Michael Knopf"
+  },
+  "repository": "https://github.com/michaelknopf/claude-code-plugins",
+  "license": "MIT",
+  "keywords": [
+    "personal",
+    "audits",
+    "documentation"
+  ]
+}

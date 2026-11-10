@@ -1,0 +1,13 @@
+.idea/
+.DS_Store
+
+# No trailing slash so this matches both a `.claude/` directory and a `.claude`
+# symlink (worktrees symlink it to the main checkout's `.claude`).
+/.claude
+
+# Environment variables with secrets
+.env
+
+# git worktrees
+.worktrees/
+

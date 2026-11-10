@@ -5,27 +5,21 @@ Opinionated Claude Code plugins built around explicit, written principles. Two p
 - **`dev`** — deep PR review, plan review, and the engineering principles they're grounded in. Needs nothing beyond Claude Code and `gh`.
 - **`mk`** — personal extras: disk cleanup, Gmail filters, an artifact-structure skill, a statusline, and an orphaned-process reaper. Published as a reference rather than a recommendation.
 
-## Installation
+## Installation from source (live-linked)
+
+This is the recommended setup. Claude Code loads the plugins from symlinks into your clone, so a `git pull` or a local edit takes effect in the next session, with no version bump and no update step.
+
+**1. Clone the repo.**
 
 ```bash
-git clone https://github.com/michaelknopf/claude-code-plugins.git
-claude plugin marketplace add ./claude-code-plugins
-claude plugin install dev@mk-plugins
-claude plugin install mk@mk-plugins   # optional
+mkdir -p ~/code/github/michaelknopf
+git clone https://github.com/michaelknopf/claude-code-plugins.git ~/code/github/michaelknopf/claude-code-plugins
 ```
 
-Plugins install with `user` scope by default. Use `--scope project` to limit one to the current project.
-
-Installing this way copies the plugin into a versioned cache, and Claude Code only picks up changes when the `version` in `plugin.json` changes. If you're editing the plugins, use the live-linked setup below instead.
-
-### Editing the plugins: install live-linked
-
-If you're changing commands, skills, or principle docs, install from a local marketplace that symlinks your working tree instead of copying it. Edits then take effect on the next session — no version bump, no update step.
-
-Create a marketplace manifest outside the repo (it hardcodes an absolute path, so it must not be committed):
+**2. Create a local marketplace that points at the clone.** It hardcodes an absolute path, so it lives outside the repo and is never committed.
 
 ```bash
-CLONE="$(pwd)"                       # run from your clone's root
+CLONE="$HOME/code/github/michaelknopf/claude-code-plugins"
 LIVE="$HOME/.claude/local-marketplaces/mk-live"
 mkdir -p "$LIVE/.claude-plugin"
 cat > "$LIVE/.claude-plugin/marketplace.json" <<EOF
@@ -37,54 +31,57 @@ cat > "$LIVE/.claude-plugin/marketplace.json" <<EOF
     {
       "name": "dev",
       "source": { "source": "command", "command": "echo $CLONE/plugins/dev", "mode": "link" },
-      "description": "Core development commands",
-      "author": { "name": "Michael Knopf" }
+      "description": "Deep PR review, plan review, and engineering principles"
     },
     {
       "name": "mk",
       "source": { "source": "command", "command": "echo $CLONE/plugins/mk", "mode": "link" },
-      "description": "Personal commands",
-      "author": { "name": "Michael Knopf" }
+      "description": "Personal commands"
     }
   ]
 }
 EOF
 ```
 
-Then register it and swap your installs:
+**3. Register it and install the plugins.** Run these **in your own terminal**, not inside a Claude Code session. A `command` source runs a shell command, so Claude Code makes you review and accept it interactively, and `--yes` is ignored in-session.
 
 ```bash
-claude plugin marketplace add "$LIVE"
-
-# Remove the cached copies first — a plugin can only be installed from one marketplace.
-claude plugin uninstall dev@mk-plugins
-claude plugin uninstall mk@mk-plugins
-
+claude plugin marketplace add "$HOME/.claude/local-marketplaces/mk-live"
 claude plugin install dev@mk-live
-claude plugin install mk@mk-live
+claude plugin install mk@mk-live   # optional
 ```
 
-Run the two `install` commands **in your own terminal**, not inside a Claude Code session. A `command` source executes a shell command, so Claude Code requires you to review and accept it interactively; `--yes` is ignored in-session by design.
-
-Verify the link took — each top-level entry should be a symlink into your clone:
+**4. Check that the link took.** Each top-level entry should be a symlink into your clone.
 
 ```bash
 ls -la "$(claude plugin list --json | jq -r '.[] | select(.id=="dev@mk-live") | .installPath')"
 ```
 
-To go back to the cached install, uninstall the `@mk-live` plugins and reinstall from `@mk-plugins`.
+To update on a machine, `git pull` in the clone. If a plugin is already installed from another marketplace (such as the cached `mk-plugins` install below), uninstall it first, because a plugin can only be installed from one marketplace.
 
-### Releasing a change
+### Alternative: cached install
 
-Because consumers install from the cached `mk-plugins` marketplace, **a change is not delivered until the version is bumped**. When landing a PR that touches `plugins/<name>/**`, bump `version` in both `plugins/<name>/.claude-plugin/plugin.json` and the matching entry in `.claude-plugin/marketplace.json` — `claude plugin tag` validates that the two agree.
+```bash
+claude plugin marketplace add michaelknopf/claude-code-plugins
+claude plugin install dev@mk-plugins
+```
+
+This copies the plugin into a versioned cache. Claude Code only picks up changes when the `version` in `plugin.json` changes, so when changing `plugins/<name>/**`, bump `version` in both `plugins/<name>/.claude-plugin/plugin.json` and the matching entry in `.claude-plugin/marketplace.json`.
 
 ### Load the coding principles
 
-`plugins/dev/docs/general-principles.md` and `python-principles.md` are meant to be imported into `~/.claude/CLAUDE.md`:
+`general-principles.md` and `python-principles.md` are meant to be imported into `~/.claude/CLAUDE.md`, so they're in every session. With the clone at the path above:
 
 ```markdown
-@/path/to/claude-code-plugins/plugins/dev/docs/general-principles.md
-@/path/to/claude-code-plugins/plugins/dev/docs/python-principles.md
+@~/code/github/michaelknopf/claude-code-plugins/plugins/dev/docs/general-principles.md
+@~/code/github/michaelknopf/claude-code-plugins/plugins/dev/docs/python-principles.md
+```
+
+`general-principles.md` tells Claude to make every change in a git worktree under `.worktrees/`. Ignore that directory everywhere with a global gitignore:
+
+```bash
+git config --global core.excludesFile ~/.gitignore_global
+echo '.worktrees/' >> ~/.gitignore_global
 ```
 
 The other docs are loaded on demand by the skills and agents that need them.

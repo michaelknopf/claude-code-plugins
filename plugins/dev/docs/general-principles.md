@@ -3,7 +3,7 @@
 ## Workflow
 
 - **Never commit or push directly to `main`.** If you make changes with main checked out, create a new branch before committing.
-- **Make changes in a worktree, on a branch.** Create one with `git worktree add .worktrees/<branch> -b <branch>` (keep `.worktrees/` git-ignored), run the project's setup in it (`uv sync`, `pnpm install`, etc.), and remove it with `git worktree remove <path>` when done. `git worktree list` recovers paths.
+- **Make every change in a worktree, on a branch — never in the primary clone.** This applies to any change that modifies files, however small; read-only work (investigating, running tests) can happen in the primary clone. Create one from the primary clone with `git worktree add .worktrees/<branch> -b <branch>`, make sure `.worktrees/` is git-ignored, and run the project's setup in it (`uv sync`, `pnpm install`, copying untracked local config, etc.), since a fresh worktree has none of it. Remove it with `git worktree remove <path>` when done; `git worktree list` recovers paths.
 - **Do not leave deprecated code behind.** We don't need it for backwards compatibility or for future reference. Delete it and update consumers to use the updated implementation.
 - **Merge with `gh pr merge --squash`, then clean up locally.** Do *not* pass `--delete-branch`: it makes `gh` try to check out the default branch locally, which fails because the primary clone already holds it (`fatal: 'main' is already used by worktree`). The merge itself still lands, but `gh` exits non-zero and skips its cleanup — so the error looks like a failed merge and isn't one. Skip the flag, then remove the worktree and delete the merged branch yourself.
 - When creating PRs, do NOT add a "Test plan" section.
